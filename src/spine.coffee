@@ -99,10 +99,10 @@ class Model extends Module
 
   @toString: -> "#{@className}(#{@attributes.join(", ")})"
 
-  @find: (id) ->
-    record = @records[id]
-    if !record and ("#{id}").match(/c-\d+/)
-      return @findCID(id)
+  @find: (_id) ->
+    record = @records[_id]
+    if !record and ("#{_id}").match(/c-\d+/)
+      return @findCID(_id)
     throw new Error('Unknown record') unless record
     record.clone()
 
@@ -111,9 +111,9 @@ class Model extends Module
     throw new Error('Unknown record') unless record
     record.clone()
 
-  @exists: (id) ->
+  @exists: (_id) ->
     try
-      return @find(id)
+      return @find(_id)
     catch e
       return false
 
@@ -126,19 +126,19 @@ class Model extends Module
     records = [records] unless isArray(records)
 
     for record in records
-      record.id           or= record.cid
-      @records[record.id]   = record
+      record._id           or= record.cid
+      @records[record._id]   = record
       @crecords[record.cid] = record
 
     @trigger('refresh', @cloneArray(records))
     this
 
   @select: (callback) ->
-    result = (record for id, record of @records when callback(record))
+    result = (record for _id, record of @records when callback(record))
     @cloneArray(result)
 
   @findByAttribute: (name, value) ->
-    for id, record of @records
+    for _id, record of @records
       if record[name] is value
         return record.clone()
     null
@@ -174,15 +174,15 @@ class Model extends Module
     for key, value of @records
       @records[key].destroy()
 
-  @update: (id, atts, options) ->
-    @find(id).updateAttributes(atts, options)
+  @update: (_id, atts, options) ->
+    @find(_id).updateAttributes(atts, options)
 
   @create: (atts, options) ->
     record = new @(atts)
     record.save(options)
 
-  @destroy: (id, options) ->
-    @find(id).destroy(options)
+  @destroy: (_id, options) ->
+    @find(_id).destroy(options)
 
   @change: (callbackOrParams) ->
     if typeof callbackOrParams is 'function'
@@ -229,6 +229,9 @@ class Model extends Module
     uid = @uid(prefix) if @exists(uid)
     uid
 
+  @uuid: () ->
+    uuid.v1().replace(/-/g, '') # remove dashes
+
   # Instance
 
   constructor: (atts) ->
@@ -259,12 +262,12 @@ class Model extends Module
         result[key] = @[key]()
       else
         result[key] = @[key]
-    result.id = @id if @id
+    result._id = @_id if @_id
     result
 
   eql: (rec) ->
     !!(rec and rec.constructor is @constructor and
-        (rec.cid is @cid) or (rec.id and rec.id is @id))
+        (rec.cid is @cid) or (rec._id and rec._id is @_id))
 
   save: (options = {}) ->
     unless options.validate is false
@@ -286,16 +289,16 @@ class Model extends Module
     @load(atts)
     @save(options)
 
-  changeID: (id) ->
+  changeID: (_id) ->
     records = @constructor.records
-    records[id] = records[@id]
-    delete records[@id]
-    @id = id
+    records[_id] = records[@_id]
+    delete records[@_id]
+    @_id = _id
     @save()
 
   destroy: (options = {}) ->
     @trigger('beforeDestroy', options)
-    delete @constructor.records[@id]
+    delete @constructor.records[@_id]
     delete @constructor.crecords[@cid]
     @destroyed = true
     @trigger('destroy', options)
@@ -308,7 +311,7 @@ class Model extends Module
     if newRecord is false
       result.cid = @cid
     else
-      delete result.id
+      delete result._id
     result
 
   clone: ->
@@ -316,7 +319,7 @@ class Model extends Module
 
   reload: ->
     return this if @isNew()
-    original = @constructor.find(@id)
+    original = @constructor.find(@_id)
     @load(original.attributes())
     original
 
@@ -333,25 +336,26 @@ class Model extends Module
     @load(result)
 
   exists: ->
-    @id && @id of @constructor.records
+    @_id && @_id of @constructor.records
 
   # Private
 
   update: (options) ->
     @trigger('beforeUpdate', options)
     records = @constructor.records
-    records[@id].load @attributes()
-    clone = records[@id].clone()
+    records[@_id].load @attributes()
+    clone = records[@_id].clone()
     clone.trigger('update', options)
     clone.trigger('change', 'update', options)
     clone
 
   create: (options) ->
     @trigger('beforeCreate', options)
-    @id          = @cid unless @id
+    @_id = @constructor.uuid()
+    #@_id          = @cid unless @_id
 
     record       = @dup(false)
-    @constructor.records[@id]   = record
+    @constructor.records[@_id]   = record
     @constructor.crecords[@cid] = record
 
     clone        = record.clone()

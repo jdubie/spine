@@ -17,9 +17,9 @@ class Collection extends Spine.Module
     values = @all()
     values[values.length - 1]
 
-  find: (id) ->
+  find: (_id) ->
     records = @select (rec) =>
-      rec.id + '' is id + ''
+      rec._id + '' is _id + ''
     throw('Unknown record') unless records[0]
     records[0]
 
@@ -35,26 +35,26 @@ class Collection extends Spine.Module
       @associated(rec) and cb(rec)
 
   refresh: (values) ->
-    delete @model.records[record.id] for record in @all()
+    delete @model.records[record._id] for record in @all()
     records = @model.fromJSON(values)
 
     records = [records] unless isArray(records)
 
     for record in records
       record.newRecord = false
-      record[@fkey] = @record.id
-      @model.records[record.id] = record
+      record[@fkey] = @record._id
+      @model.records[record._id] = record
 
     @model.trigger('refresh', @model.cloneArray(records))
 
   create: (record) ->
-    record[@fkey] = @record.id
+    record[@fkey] = @record._id
     @model.create(record)
 
   # Private
 
   associated: (record) ->
-    record[@fkey] is @record.id
+    record[@fkey] is @record._id
 
 class Instance extends Spine.Module
   constructor: (options = {}) ->
@@ -68,7 +68,7 @@ class Instance extends Spine.Module
     unless value instanceof @model
       value = new @model(value)
     value.save() if value.isNew()
-    @record[@fkey] = value and value.id
+    @record[@fkey] = value and value._id
 
 class Singleton extends Spine.Module
   constructor: (options = {}) ->
@@ -76,13 +76,13 @@ class Singleton extends Spine.Module
       @[key] = value
 
   find: ->
-    @record.id and @model.findByAttribute(@fkey, @record.id)
+    @record._id and @model.findByAttribute(@fkey, @record._id)
 
   update: (value) ->
     unless value instanceof @model
       value = @model.fromJSON(value)
 
-    value[@fkey] = @record.id
+    value[@fkey] = @record._id
     value.save()
 
 singularize = (str) ->
@@ -97,7 +97,7 @@ underscore = (str) ->
 
 Spine.Model.extend
   hasMany: (name, model, fkey) ->
-    fkey ?= "#{underscore(this.className)}_id"
+    fkey ?= "#{underscore(this.className)}__id"
 
     association = (record) ->
       model = require(model) if typeof model is 'string'
@@ -112,7 +112,7 @@ Spine.Model.extend
       association(@)
 
   belongsTo: (name, model, fkey) ->
-    fkey ?= "#{singularize(name)}_id"
+    fkey ?= "#{singularize(name)}__id"
 
     association = (record) ->
       model = require(model) if typeof model is 'string'
@@ -129,7 +129,7 @@ Spine.Model.extend
     @attributes.push(fkey)
 
   hasOne: (name, model, fkey) ->
-    fkey ?= "#{underscore(@className)}_id"
+    fkey ?= "#{underscore(@className)}__id"
 
     association = (record) ->
       model = require(model) if typeof model is 'string'

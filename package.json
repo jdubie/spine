@@ -15,5 +15,8 @@
   "main" : "./index.js",
   "scripts": {
     "test": "for i in test/*.html; do phantomjs test/lib/run-jasmine.phantom.js file://`pwd`/$i; done"
+  },
+  "devDependencies": {
+    "coffee-script": "*"
   }
 }

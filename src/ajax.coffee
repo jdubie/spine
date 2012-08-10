@@ -74,8 +74,8 @@ class Base
 class Collection extends Base
   constructor: (@model) ->
 
-  find: (id, params) ->
-    record = new @model(id: id)
+  find: (_id, params) ->
+    record = new @model(_id: _id)
     @ajaxQueue(
       params,
       type: 'GET',
@@ -92,9 +92,9 @@ class Collection extends Base
      .fail(@failResponse)
 
   fetch: (params = {}, options = {}) ->
-    if id = params.id
-      delete params.id
-      @find(id, params).done (record) =>
+    if _id = params._id
+      delete params._id
+      @find(_id, params).done (record) =>
         @model.refresh(record, options)
     else
       @all(params).done (records) =>
@@ -158,8 +158,8 @@ class Singleton extends Base
       Ajax.disable =>
         if data
           # ID change, need to do some shifting
-          if data.id and @record.id isnt data.id
-            @record.changeID(data.id)
+          if data._id and @record._id isnt data._id
+            @record.changeID(data._id)
 
           # Update with latest data
           @record.updateAttributes(data.attributes())
@@ -183,7 +183,7 @@ Include =
   url: (args...) ->
     url = Ajax.getURL(@constructor)
     url += '/' unless url.charAt(url.length - 1) is '/'
-    url += encodeURIComponent(@id)
+    url += encodeURIComponent(@_id)
     args.unshift(url)
     args.join('/')
 
