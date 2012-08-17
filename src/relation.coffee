@@ -129,7 +129,7 @@ Spine.Model.extend
     @attributes.push(fkey)
 
   hasOne: (name, model, fkey) ->
-    fkey ?= "#{underscore(@className)}__id"
+    fkey ?= "#{underscore(@className)}_id"
 
     association = (record) ->
       model = require(model) if typeof model is 'string'
