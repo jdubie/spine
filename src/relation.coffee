@@ -97,7 +97,7 @@ underscore = (str) ->
 
 Spine.Model.extend
   hasMany: (name, model, fkey) ->
-    fkey ?= "#{underscore(this.className)}__id"
+    fkey ?= "#{underscore(this.className)}_id"
 
     association = (record) ->
       model = require(model) if typeof model is 'string'
@@ -112,7 +112,7 @@ Spine.Model.extend
       association(@)
 
   belongsTo: (name, model, fkey) ->
-    fkey ?= "#{singularize(name)}__id"
+    fkey ?= "#{singularize(name)}_id"
 
     association = (record) ->
       model = require(model) if typeof model is 'string'
