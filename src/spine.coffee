@@ -351,7 +351,7 @@ class Model extends Module
 
   create: (options) ->
     @trigger('beforeCreate', options)
-    @_id = @constructor.uuid()
+    @_id ?= @constructor.uuid() # hacky
     #@_id          = @cid unless @_id
 
     record       = @dup(false)
