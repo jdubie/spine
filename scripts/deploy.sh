@@ -1,5 +1,6 @@
 #!/bin/sh
 
 node_modules/.bin/cake build
-cp -r lib ../porcupine/vendor/scripts/spine
-mv ../porcupine/vendor/scripts/spine/lib/spine.js ../porcupine/vendor/scripts/spine/spine.js
+mkdir ../porcupine/node_modules/spine -p
+cp -r lib ../porcupine/node_modules/spine/lib
+cp -r src ../porcupine/node_modules/spine/src
