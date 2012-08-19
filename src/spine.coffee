@@ -483,7 +483,7 @@ class Controller extends Module
 
 # Utilities & Shims
 
-$ = window?.jQuery or window?.Zepto or (element) -> element
+$ = window?.jQuery or window?.Zepto or module?.require('jquery')
 
 createObject = Object.create or (o) ->
   Func = ->
