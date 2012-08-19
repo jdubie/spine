@@ -6,6 +6,8 @@ namedParam   = /:([\w\d]+)/g
 splatParam   = /\*([\w\d]+)/g
 escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
 
+window = window ? module?.require('jsdom').createWindow()
+
 class Spine.Route extends Spine.Module
   @extend Spine.Events
 
