@@ -6,7 +6,7 @@ namedParam   = /:([\w\d]+)/g
 splatParam   = /\*([\w\d]+)/g
 escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
 
-window = window ? module?.require('jsdom').createWindow()
+#window = window ? module?.require('jsdom').createWindow()
 
 class Spine.Route extends Spine.Module
   @extend Spine.Events
@@ -60,8 +60,9 @@ class Spine.Route extends Spine.Module
     options = $.extend({}, @options, options)
 
     path = args.join('/')
-    return if @path is path
+    #return if @path is path # todo make it an option to re-run routes
     @path = path
+
 
     @trigger('navigate', @path)
 
