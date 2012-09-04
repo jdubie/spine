@@ -9,6 +9,11 @@ escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
 #window = window ? module?.require('jsdom').createWindow()
 
 class Spine.Route extends Spine.Module
+
+  ###
+    static methods
+  ###
+
   @extend Spine.Events
 
   @historySupport: window.history?.pushState?
@@ -106,18 +111,25 @@ class Spine.Route extends Spine.Module
         @trigger('change', route, path)
         return route
 
+  ###
+    instance methods
+  ###
+
   constructor: (@path, @callback) ->
     @names = []
 
     if typeof path is 'string'
+      ## parse all variables in path of type :name
       namedParam.lastIndex = 0
       while (match = namedParam.exec(path)) != null
         @names.push(match[1])
 
+      ## parse all variables in path of type (*)
       splatParam.lastIndex = 0
       while (match = splatParam.exec(path)) != null
         @names.push(match[1])
 
+      ## create a proper regular expression
       path = path.replace(escapeRegExp, '\\$&')
                  .replace(namedParam, '([^\/]*)')
                  .replace(splatParam, '(.*?)')
@@ -126,9 +138,11 @@ class Spine.Route extends Spine.Module
     else
       @route = path
 
+  ## matches current route on a path
   match: (path, options = {}) ->
     match = @route.exec(path)
     return false unless match
+    ## upon match, retrieves variables/parameters of route
     options.match = match
     params = match.slice(1)
 
@@ -136,6 +150,9 @@ class Spine.Route extends Spine.Module
       for param, i in params
         options[@names[i]] = param
 
+    ## performs callback
+    ##    false return value will cause matchRoute to continue to
+    ##    search for matching routes
     @callback.call(null, options) isnt false
 
 # Coffee-script bug
