@@ -141,6 +141,7 @@ class Singleton extends Base
   destroy: (params, options) ->
     @ajaxQueue(
       params,
+      data: JSON.stringify(@record) # todo override to do this
       type: 'DELETE'
       url:  Ajax.getURL(@record)
     ).done(@recordResponse(options))
