@@ -1,7 +1,7 @@
 Spine = @Spine or require('spine')
 $     = Spine.$
 
-hashStrip    = /^#!*/
+hashStrip    = /^#*!?/
 namedParam   = /:([\w\d]+)/g
 splatParam   = /\*([\w\d]+)/g
 escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
