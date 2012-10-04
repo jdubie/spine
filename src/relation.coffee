@@ -1,7 +1,7 @@
 Spine   = @Spine or window?.require('spine') or module?.require('spine')
 Spine   = window?.Spine or window?.require('spine') or module?.require('spine')
 isArray = Spine.isArray
-require = @require or ((value) -> eval(value)) or module?.require('spine')
+require = @require or module?.require('spine') or ((value) -> eval(value))
 
 class Collection extends Spine.Module
   constructor: (options = {}) ->
