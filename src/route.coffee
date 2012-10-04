@@ -6,7 +6,7 @@ namedParam   = /:([\w\d]+)/g
 splatParam   = /\*([\w\d]+)/g
 escapeRegExp = /[-[\]{}()+?.,\\^$|#\s]/g
 
-#window = window ? module?.require('jsdom').createWindow()
+wndow = window ? module.require('jsdom').createWindow()
 
 class Spine.Route extends Spine.Module
 
@@ -16,7 +16,7 @@ class Spine.Route extends Spine.Module
 
   @extend Spine.Events
 
-  @historySupport: window.history?.pushState?
+  @historySupport: wndow.history?.pushState?
 
   @routes: []
 
@@ -40,18 +40,18 @@ class Spine.Route extends Spine.Module
     return if @options.shim
 
     if @history
-      $(window).bind('popstate', @change)
+      $(wndow).bind('popstate', @change)
     else
-      $(window).bind('hashchange', @change)
+      $(wndow).bind('hashchange', @change)
     @change()
 
   @unbind: ->
     return if @options.shim
 
     if @history
-      $(window).unbind('popstate', @change)
+      $(wndow).unbind('popstate', @change)
     else
-      $(window).unbind('hashchange', @change)
+      $(wndow).unbind('hashchange', @change)
 
   @navigate: (args...) ->
     options = {}
@@ -82,17 +82,17 @@ class Spine.Route extends Spine.Module
         @path
       )
     else
-      window.location.hash = @path
+      wndow.location.hash = @path
 
   # Private
 
   @getPath: ->
-    path = window.location.pathname
+    path = wndow.location.pathname
     if path.substr(0,1) isnt '/'
       path = '/' + path
     path
 
-  @getHash: -> window.location.hash
+  @getHash: -> wndow.location.hash
 
   @getFragment: -> @getHash().replace(hashStrip, '')
 
